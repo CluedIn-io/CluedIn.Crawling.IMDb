@@ -9,33 +9,38 @@ using CluedIn.Crawling.IMDb.Vocabularies;
 
 namespace CluedIn.Crawling.IMDb.ClueProducers
 {
-    public class TitleModelClueProducer : BaseClueProducer<TitleModel>
+    public class TitleAKAModelClueProducer : BaseClueProducer<TitleAKAModel>
     {
         private readonly IClueFactory _factory;
 
-        public TitleModelClueProducer([NotNull] IClueFactory factory)
+        public TitleAKAModelClueProducer([NotNull] IClueFactory factory)
         {
             _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
-        protected override Clue MakeClueImpl(TitleModel input, Guid accountId)
+        protected override Clue MakeClueImpl(TitleAKAModel input, Guid accountId)
         {
             if (input == null)
             {
                 throw new ArgumentNullException(nameof(input));
             }
 
-            var clue = _factory.Create(IMDbConstants.EntityTypes.Title, input.TitleId, accountId);
+            var clue = _factory.Create(IMDbConstants.EntityTypes.TitleAKA, input.TitleId, accountId);
 
             var data = clue.Data.EntityData;
             var properties = data.Properties;
 
             data.Name = input.Title;
 
-            var titleVocabulary = IMDbVocabularyFactory.GetTitleVocabulary();
+            var titleVocabulary = IMDbVocabularyFactory.GetTitleAKAVocabulary();
             
             // titleId (string) - a tconst, an alphanumeric unique identifier of the title
             properties[titleVocabulary.TitleId] = input.TitleId;
+            
+            // (Title AKA)-[:AKA]->(Title)
+            _factory.CreateOutgoingEntityReference(clue, IMDbConstants.EntityTypes.Title,
+                IMDbConstants.EntityEdgeTypes.AKA, input, input.TitleId); 
+            
             // ordering (integer) – a number to uniquely identify rows for a given titleId
             properties[titleVocabulary.Ordering] = input.Ordering.PrintIfAvailable();
             // title (string) – the localized title

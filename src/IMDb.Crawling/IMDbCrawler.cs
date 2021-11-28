@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using CluedIn.Core.Crawling;
 using CluedIn.Crawling.IMDb.Core;
 using CluedIn.Crawling.IMDb.Infrastructure.Factories;
@@ -23,9 +24,9 @@ namespace CluedIn.Crawling.IMDb
 
             var client = _clientFactory.CreateNew(IMDbcrawlJobData);
 
-            foreach (var title in client.GetTitles(IMDbcrawlJobData))
+            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData).Take(100))
             {
-                yield return title;
+                yield return titleAkaModel;
             }
         }
     }

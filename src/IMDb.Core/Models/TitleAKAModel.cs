@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace CluedIn.Crawling.IMDb.Core.Models
 {
-    public class TitleModel
+    public class TitleAKAModel
     {
         /// <summary>
         /// titleId (string) - a tconst, an alphanumeric unique identifier of the title

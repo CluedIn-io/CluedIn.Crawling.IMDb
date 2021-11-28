@@ -2,16 +2,16 @@
 {
     public static class IMDbVocabularyFactory
     {
-        private static readonly TitleVocabulary TitleVocabulary;
+        private static readonly TitleAKAVocabulary TitleAkaVocabulary;
 
         static IMDbVocabularyFactory()
         {
-            TitleVocabulary = new TitleVocabulary();
+            TitleAkaVocabulary = new TitleAKAVocabulary();
         }
 
-        public static TitleVocabulary GetTitleVocabulary()
+        public static TitleAKAVocabulary GetTitleAKAVocabulary()
         {
-            return TitleVocabulary;
+            return TitleAkaVocabulary;
         }
     }
 }

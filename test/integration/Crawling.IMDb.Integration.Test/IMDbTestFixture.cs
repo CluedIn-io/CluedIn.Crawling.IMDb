@@ -33,7 +33,7 @@ namespace CluedIn.Crawling.IMDb.Integration.Test
 
             debugCrawlerHost.ProcessClue += ClueStorage.AddClue;
 
-            var vocab = new TitleVocabulary();
+            var vocab = new TitleAKAVocabulary();
 
             debugCrawlerHost.Execute(IMDbConfiguration.Create(), IMDbConstants.ProviderId);
         }

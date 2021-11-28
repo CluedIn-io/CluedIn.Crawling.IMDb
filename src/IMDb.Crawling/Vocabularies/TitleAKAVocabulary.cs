@@ -4,16 +4,16 @@ using CluedIn.Crawling.IMDb.Core;
 
 namespace CluedIn.Crawling.IMDb.Vocabularies
 {
-    public class TitleVocabulary : SimpleVocabulary
+    public class TitleAKAVocabulary : SimpleVocabulary
     {
-        public TitleVocabulary()
+        public TitleAKAVocabulary()
         {
-            VocabularyName = "IMDb Title";
-            KeyPrefix = "IMDb.title";
+            VocabularyName = "IMDb Title AKA";
+            KeyPrefix = "IMDb.title.aka";
             KeySeparator = ".";
-            Grouping = IMDbConstants.EntityTypes.Title;
+            Grouping = IMDbConstants.EntityTypes.TitleAKA;
 
-            AddGroup("IMDb Title", group =>
+            AddGroup("IMDb Title AKA", group =>
             {
                 TitleId = group.Add(new VocabularyKey(nameof(TitleId), VocabularyKeyDataType.Identifier))
                     .WithDescription("titleId (string) - a tconst, an alphanumeric unique identifier of the title");
