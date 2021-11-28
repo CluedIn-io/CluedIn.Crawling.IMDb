@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\IMDb.Core\Crawling.IMDb.Core.csproj" />
+    <ProjectReference Include="..\..\..\src\IMDb.Crawling\Crawling.IMDb.csproj" />
+    <ProjectReference Include="..\..\..\src\IMDb.Infrastructure\Crawling.IMDb.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\IMDb.Infrastructure\Crawling.IMDb.Infrastructure.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="IMDbCrawlerComponent.config">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CluedIn.Core" />
+    <PackageReference Include="CluedIn.Core.Agent" />
+    <PackageReference Include="CluedIn.Server.Common.WebApi" />
+    <PackageReference Include="CluedIn.Agent" />
+  </ItemGroup>
+</Project>
