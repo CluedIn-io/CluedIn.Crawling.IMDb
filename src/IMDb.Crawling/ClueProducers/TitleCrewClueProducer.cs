@@ -21,7 +21,7 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
 
-            var clue = _factory.Create(IMDbConstants.EntityTypes.TitleCrew, input.TitleId, accountId);
+            var clue = _factory.Create(IMDbConstants.EntityTypes.TitleBasic, input.TitleId, accountId);
 
             var data = clue.Data.EntityData;
 

@@ -38,7 +38,6 @@ namespace CluedIn.Crawling.IMDb.Core
             public const string NameBasic = "/IMDb/Name/Basic";
             public const string TitleAKA = "/IMDb/Title/AKA";
             public const string TitleBasic = "/IMDb/Title/Basic";
-            public const string TitleCrew = "/IMDb/Title/Crew";
             public const string TitleEpisode = "/IMDb/Title/Episode";
             public const string TitlePrincipal = "/IMDb/Title/Principal";
         }
