@@ -2,16 +2,11 @@
 {
     public static class IMDbVocabularyFactory
     {
-        private static readonly TitleAKAVocabulary TitleAkaVocabulary;
-
-        static IMDbVocabularyFactory()
-        {
-            TitleAkaVocabulary = new TitleAKAVocabulary();
-        }
-
-        public static TitleAKAVocabulary GetTitleAKAVocabulary()
-        {
-            return TitleAkaVocabulary;
-        }
+        public static readonly NameBasicVocabulary NameBasicVocabulary = new NameBasicVocabulary();
+        public static readonly TitleAKAVocabulary TitleAKAVocabulary = new TitleAKAVocabulary();
+        public static readonly TitleBasicVocabulary TitleBasicVocabulary = new TitleBasicVocabulary();
+        public static readonly TitleCrewVocabulary TitleCrewVocabulary = new TitleCrewVocabulary();
+        public static readonly TitleEpisodeVocabulary TitleEpisodeVocabulary = new TitleEpisodeVocabulary();
+        public static readonly TitlePrincipalVocabulary TitlePrincipalVocabulary = new TitlePrincipalVocabulary();
     }
 }

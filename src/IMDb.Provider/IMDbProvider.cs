@@ -26,6 +26,8 @@ namespace CluedIn.Crawling.Provider.IMDb
             _IMDbClientFactory = IMDbClientFactory;
         }
 
+        public override bool ScheduleCrawlJobs { get; } = false;
+
         public string ServiceType { get; } = JsonConvert.SerializeObject(IMDbConstants.ServiceType);
         public string Aliases { get; } = JsonConvert.SerializeObject(IMDbConstants.Aliases);
 
@@ -122,9 +124,7 @@ namespace CluedIn.Crawling.Provider.IMDb
 
         public override string Schedule(DateTimeOffset relativeDateTime, bool webHooksEnabled)
         {
-            return webHooksEnabled && ConfigurationManager.AppSettings.GetFlag("Feature.Webhooks.Enabled", false)
-                ? $"{relativeDateTime.Minute} 0/23 * * *"
-                : $"{relativeDateTime.Minute} 0/4 * * *";
+            return $"{relativeDateTime.Minute} 0/23 * * *";
         }
 
         public override Task<IEnumerable<WebHookSignature>> CreateWebHook(ExecutionContext context,

@@ -20,7 +20,10 @@ namespace CluedIn.Crawling.IMDb.Integration.Test
         [Theory]
         [InlineData("/Provider/Root", 1)]
         //TODO: Add details for the count of entityTypes your test produces
-        [InlineData(IMDbConstants.EntityTypes.TitleAKA, 100)]
+        [InlineData(IMDbConstants.EntityTypes.TitleAKA, 10)]
+        [InlineData(IMDbConstants.EntityTypes.TitleCrew, 10)]
+        [InlineData(IMDbConstants.EntityTypes.TitleBasic, 10)]
+        [InlineData(IMDbConstants.EntityTypes.NameBasic, 10)]
         public void CorrectNumberOfEntityTypes(string entityType, int expectedCount)
         {
             var foundCount = fixture.ClueStorage.CountOfType(entityType);

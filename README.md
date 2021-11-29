@@ -41,7 +41,9 @@ Each dataset is contained in a gzipped, tab-separated-values (TSV) formatted fil
 * tconst (string) - alphanumeric unique identifier of the title
 * directors (array of nconsts) - director(s) of the given title
 * writers (array of nconsts) – writer(s) of the given title
-* title.episode.tsv.gz – Contains the tv episode information. Fields include:
+
+**title.episode.tsv.gz** – Contains the tv episode information. Fields include:
+
 * tconst (string) - alphanumeric identifier of episode
 * parentTconst (string) - alphanumeric identifier of the parent TV Series
 * seasonNumber (integer) – season number the episode belongs to
@@ -55,11 +57,15 @@ Each dataset is contained in a gzipped, tab-separated-values (TSV) formatted fil
 * category (string) - the category of job that person was in
 * job (string) - the specific job title if applicable, else '\N'
 * characters (string) - the name of the character played if applicable, else '\N'
-* title.ratings.tsv.gz – Contains the IMDb rating and votes information for titles
+
+**title.ratings.tsv.gz** – Contains the IMDb rating and votes information for titles
+
 * tconst (string) - alphanumeric unique identifier of the title
 * averageRating – weighted average of all the individual user ratings
 * numVotes - number of votes the title has received
-* name.basics.tsv.gz – Contains the following information for names:
+
+**name.basics.tsv.gz** – Contains the following information for names:
+
 * nconst (string) - alphanumeric unique identifier of the name/person
 * primaryName (string)– name by which the person is most often credited
 * birthYear – in YYYY format

@@ -24,10 +24,32 @@ namespace CluedIn.Crawling.IMDb
 
             var client = _clientFactory.CreateNew(IMDbcrawlJobData);
 
-            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData).Take(100))
+            foreach (var nameBasicModel in client.GetNames(IMDbcrawlJobData))
+            {
+                yield return nameBasicModel;
+            }
+
+            foreach (var basicModel in client.GetTitleBasics(IMDbcrawlJobData))
+            {
+                yield return basicModel;
+            }
+
+            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData))
             {
                 yield return titleAkaModel;
             }
+
+            foreach (var titleCrewModel in client.GetTitleCrew(IMDbcrawlJobData))
+            {
+                yield return titleCrewModel;
+            }
+
+            foreach (var titleRatingModel in client.GetTitleRatings(IMDbcrawlJobData))
+            {
+                yield return titleRatingModel;
+            }
+
+            client.Cleanup();
         }
     }
 }

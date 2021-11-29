@@ -3,7 +3,7 @@
     <ProjectReference Include="..\IMDb.Infrastructure\Crawling.IMDb.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\IMDb.png" />
+    <EmbeddedResource Include="Resources\imdb.png" />
     <EmbeddedResource Include="IMDbProviderComponent.config">
       <SubType>Designer</SubType>
     </EmbeddedResource>

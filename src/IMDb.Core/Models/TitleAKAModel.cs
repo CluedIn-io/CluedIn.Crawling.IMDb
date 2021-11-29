@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Newtonsoft.Json;
 
 namespace CluedIn.Crawling.IMDb.Core.Models
 {

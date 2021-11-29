@@ -1,5 +1,4 @@
-﻿using CluedIn.Core.Data;
-using CluedIn.Core.Data.Vocabularies;
+﻿using CluedIn.Core.Data.Vocabularies;
 using CluedIn.Crawling.IMDb.Core;
 
 namespace CluedIn.Crawling.IMDb.Vocabularies
@@ -31,34 +30,34 @@ namespace CluedIn.Crawling.IMDb.Vocabularies
 
             // TODO: Mappings
         }
-        
+
         /// <summary>
-        /// titleId (string) - a tconst, an alphanumeric unique identifier of the title
+        ///     titleId (string) - a tconst, an alphanumeric unique identifier of the title
         /// </summary>
         public VocabularyKey TitleId { get; private set; }
-        
+
         /// <summary>
-        /// ordering (integer) – a number to uniquely identify rows for a given titleId
+        ///     ordering (integer) – a number to uniquely identify rows for a given titleId
         /// </summary>
         public VocabularyKey Ordering { get; private set; }
-        
+
         /// <summary>
-        /// title (string) – the localized title
+        ///     title (string) – the localized title
         /// </summary>
         public VocabularyKey Title { get; private set; }
-        
+
         /// <summary>
-        /// region (string) - the region for this version of the title
+        ///     region (string) - the region for this version of the title
         /// </summary>
         public VocabularyKey Region { get; private set; }
-        
+
         /// <summary>
-        /// language (string) - the language of the title
+        ///     language (string) - the language of the title
         /// </summary>
         public VocabularyKey Language { get; private set; }
-        
+
         /// <summary>
-        /// isOriginalTitle (boolean) – 0: not original title; 1: original title
+        ///     isOriginalTitle (boolean) – 0: not original title; 1: original title
         /// </summary>
         public VocabularyKey IsOriginalTitle { get; private set; }
     }
