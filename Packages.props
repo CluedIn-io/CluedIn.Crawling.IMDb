@@ -27,6 +27,7 @@
 
         MUST SPECIFY IN CSPROJ AS <PackageReference Name="<depName>" />
     -->
+    <PackageReference Update="MongoDB.Driver" Version="2.14.0" />
     <PackageReference Update="ComponentHost" Version="$(_ComponentHost)" />
     <PackageReference Update="CluedIn.Crawling" Version="$(_CluedIn)" />
     <PackageReference Update="CluedIn.CrawlerIntegrationTesting" Version="$(_CluedIn)" />

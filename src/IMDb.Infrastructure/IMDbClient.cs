@@ -1,14 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 using CluedIn.Core.Providers;
 using CluedIn.Crawling.IMDb.Core;
 using CluedIn.Crawling.IMDb.Core.Models;
 using Microsoft.Extensions.Logging;
+using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace CluedIn.Crawling.IMDb.Infrastructure
 {
@@ -18,10 +16,7 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
 
         public IMDbClient(ILogger<IMDbClient> log, IMDbCrawlJobData IMDbCrawlJobData)
         {
-            if (IMDbCrawlJobData == null)
-            {
-                throw new ArgumentNullException(nameof(IMDbCrawlJobData));
-            }
+            if (IMDbCrawlJobData == null) throw new ArgumentNullException(nameof(IMDbCrawlJobData));
 
             _log = log ?? throw new ArgumentNullException(nameof(log));
         }
@@ -33,93 +28,62 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
             return new AccountInformation("", "");
         }
 
-        private async Task DownloadFileAsync(string requestUri, string path)
+        private static List<string> ToList(BsonArray bsonArray)
         {
-            await using Stream stream = await new HttpClient().GetStreamAsync(requestUri);
-            await using FileStream fileStream
-                = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.None, 1024 * 1024, true);
-            await stream.CopyToAsync(fileStream);
-        }
-
-
-        private async Task UnzipFileAsync(string zipPath, string outputPath)
-        {
-            await using FileStream compressedFileStream = File.Open(zipPath, FileMode.Open);
-            await using FileStream outputFileStream = File.Create(outputPath);
-            await using var decompressor = new GZipStream(compressedFileStream, CompressionMode.Decompress);
-            decompressor.CopyTo(outputFileStream);
-        }
-
-        private string ProviderDirectoryName => IMDbConstants.ProviderName;
-
-
-        private void EnsureProviderDirectory()
-        {
-            DeleteProviderDirectory();
-            Directory.CreateDirectory(ProviderDirectoryName);
-        }
-
-        private void DeleteProviderDirectory()
-        {
-            try
-            {
-                Directory.Delete(ProviderDirectoryName, true);
-            }
-            catch (Exception e)
-            {
-                _log.LogWarning("Nothing to delete: provider directory didn't exist.");
-            }
-        }
-
-        public void Cleanup() => DeleteProviderDirectory();
-
-        private string DownloadAndUnzip(string requestUri, string fileName)
-        {
-            EnsureProviderDirectory();
-
-            var zipPath = Path.Join(ProviderDirectoryName, $"{fileName}.gz");
-            DownloadFileAsync(requestUri, zipPath)
-                .GetAwaiter()
-                .GetResult();
-
-            var tsvPath = Path.Join(ProviderDirectoryName, fileName);
-            UnzipFileAsync(zipPath, tsvPath)
-                .GetAwaiter()
-                .GetResult();
-
-            return tsvPath;
+            return bsonArray
+                .Select(x => x.AsString)
+                .Where(x => x != "\\N")
+                .ToList();
         }
 
         public IEnumerable<NameBasicModel> GetNames(IMDbCrawlJobData jobData)
         {
-            var tsvPath = DownloadAndUnzip("https://datasets.imdbws.com/name.basics.tsv.gz", "name.basics.tsv");
+            // mongodb://localhost:27017/?readPreference=primary&appname=MongoDB%20Compass&directConnection=true&ssl=false
+            _log.LogInformation($"Connection String: {jobData.ConnectionString}");
+            //var client = new MongoClient(jobData.ConnectionString);
 
-            using StreamReader streamReader = new StreamReader(tsvPath);
+            MongoClient client;
 
-            streamReader.ReadLine(); // skip the header
-
-            while (!streamReader.EndOfStream)
+            try
             {
-                NameBasicModel nameBasicModel;
+                client = new MongoClient(
+                    "mongodb://mongo:27017/?readPreference=primary&directConnection=true&ssl=false");
+                _log.LogInformation("connected");
+            }
+            catch (Exception e)
+            {
+                _log.LogError(e, e.Message);
+                throw;
+            }
 
+
+
+            var db = client.GetDatabase("imdb");
+
+            _log.LogInformation($"DB: {db.DatabaseNamespace.DatabaseName}");
+
+            var collection = db.GetCollection<BsonDocument>("name.basics");
+
+            _log.LogInformation($"Collection: {collection.CollectionNamespace.CollectionName}");
+
+            var filter = Builders<BsonDocument>.Filter.Eq("sample10", true);
+
+            var cursor = collection.Find(filter).ToCursor().ToEnumerable();
+
+            NameBasicModel model;
+
+            foreach (var document in cursor)
+            {
                 try
                 {
-                    var columns = streamReader.ReadLine()?.Split("\t");
-
-                    if (columns == null)
-                    {
-                        continue;
-                    }
-                    
-                    nameBasicModel = new NameBasicModel
-                    {
-                        PersonId = columns[0],
-                        PrimaryName = columns[1],
-                        BirthYear = columns[2],
-                        DeathYear = columns[3],
-                        PrimaryProfession = columns[4].Split(",").ToList(),
-                        KnownForTitles = columns[5].Split(",").ToList()
-                    };
+                    _log.LogInformation($"here");
+                    model = new NameBasicModel();
+                    model.PersonId = document["nconst"].AsString;
+                    model.PrimaryName = document["primaryName"].AsString;
+                    model.BirthYear = document["birthYear"].AsString;
+                    model.DeathYear = document["deathYear"].AsString;
+                    model.PrimaryProfession = ToList(document["primaryProfession"].AsBsonArray);
+                    model.KnownForTitles = ToList(document["knownForTitles"].AsBsonArray);
                 }
                 catch (Exception e)
                 {
@@ -127,86 +91,76 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
                     continue;
                 }
 
-                yield return nameBasicModel;
+                yield return model;
             }
         }
 
         public IEnumerable<TitleAKAModel> GetTitleAKAs(IMDbCrawlJobData jobData)
         {
-            var tsvPath = DownloadAndUnzip("https://datasets.imdbws.com/title.akas.tsv.gz", "title.akas.tsv");
+            var client = new MongoClient(jobData.ConnectionString);
 
-            using StreamReader streamReader = new StreamReader(tsvPath);
-            
-            streamReader.ReadLine(); // skip the header
+            var db = client.GetDatabase("imdb");
 
-            while (!streamReader.EndOfStream)
+            var collection = db.GetCollection<BsonDocument>("title.akas");
+
+            var filter = Builders<BsonDocument>.Filter.Eq("sample10", true);
+
+            var cursor = collection.Find(filter).ToCursor().ToEnumerable();
+
+            TitleAKAModel model;
+
+            foreach (var document in cursor)
             {
-                TitleAKAModel titleAkaModel;
-                
                 try
                 {
-                    var columns = streamReader.ReadLine()?.Split("\t");
-                    
-                    if (columns == null)
-                    {
-                        continue;
-                    }
-                    
-                    titleAkaModel = new TitleAKAModel
-                    {
-                        TitleId = columns[0],
-                        Ordering = int.Parse(columns[1]),
-                        Title = columns[2],
-                        Region = columns[3],
-                        Language = columns[4],
-                        Types = columns[5].Split(",").ToList(),
-                        Attributes = columns[6].Split(",").ToList(),
-                        IsOriginalTitle = columns[7] == "1"
-                    };
+                    model = new TitleAKAModel();
+                    model.TitleId = document["titleId"].AsString;
+                    model.Ordering = int.Parse(document["ordering"].AsString); // TODO:
+                    model.Title = document["title"].AsString;
+                    model.Region = document["region"].AsString;
+                    model.Language = document["language"].AsString;
+                    model.Types = ToList(document["types"].AsBsonArray);
+                    model.Attributes = ToList(document["attributes"].AsBsonArray);
+                    model.IsOriginalTitle = document["isOriginalTitle"].AsString == "1";
                 }
                 catch (Exception e)
                 {
                     _log.LogError(e, e.Message);
                     continue;
                 }
-                
-                yield return titleAkaModel;
+
+                yield return model;
             }
         }
 
         public IEnumerable<TitleBasicModel> GetTitleBasics(IMDbCrawlJobData jobData)
         {
-            var tsvPath = DownloadAndUnzip("https://datasets.imdbws.com/title.basics.tsv.gz", "title.basics.tsv");
+            var client = new MongoClient(jobData.ConnectionString);
 
-            using StreamReader streamReader = new StreamReader(tsvPath);
+            var db = client.GetDatabase("imdb");
 
-            streamReader.ReadLine(); // skip the header
+            var collection = db.GetCollection<BsonDocument>("title.basics");
 
-            while (!streamReader.EndOfStream)
+            var filter = Builders<BsonDocument>.Filter.Eq("sample10", true);
+
+            var cursor = collection.Find(filter).ToCursor().ToEnumerable();
+
+            TitleBasicModel model;
+
+            foreach (var document in cursor)
             {
-                TitleBasicModel titleBasicModel;
-
                 try
                 {
-                    var columns = streamReader.ReadLine()?.Split("\t");
-
-                    if (columns == null)
-                    {
-                        continue;
-                    }
-
-                    titleBasicModel = new TitleBasicModel
-                    {
-                        TitleId = columns[0],
-                        TitleType = columns[1],
-                        PrimaryTitle = columns[2],
-                        OriginalTitle = columns[3],
-                        IsAdult = columns[4] == "1",
-                        StartYear = columns[5],
-                        EndYear = columns[6],
-                        RuntimeMinutes = columns[7],
-                        Genres = columns[8].Split(",").ToList()
-                    };
+                    model = new TitleBasicModel();
+                    model.TitleId = document["tconst"].AsString;
+                    model.TitleType = document["titleType"].AsString;
+                    model.PrimaryTitle = document["primaryTitle"].AsString;
+                    model.OriginalTitle = document["originalTitle"].AsString;
+                    model.IsAdult = document["isAdult"].AsString == "1";
+                    model.StartYear = document["startYear"].AsString;
+                    model.EndYear = document["endYear"].AsString;
+                    model.RuntimeMinutes = document["runtimeMinutes"].AsString;
+                    model.Genres = ToList(document["genres"].AsBsonArray);
                 }
                 catch (Exception e)
                 {
@@ -214,37 +168,32 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
                     continue;
                 }
 
-                yield return titleBasicModel;
+                yield return model;
             }
         }
 
         public IEnumerable<TitleCrewModel> GetTitleCrew(IMDbCrawlJobData jobData)
         {
-            var tsvPath = DownloadAndUnzip("https://datasets.imdbws.com/title.crew.tsv.gz", "title.crew.tsv");
+            var client = new MongoClient(jobData.ConnectionString);
 
-            using StreamReader streamReader = new StreamReader(tsvPath);
+            var db = client.GetDatabase("imdb");
 
-            streamReader.ReadLine(); // skip the header
+            var collection = db.GetCollection<BsonDocument>("title.crew");
 
-            while (!streamReader.EndOfStream)
+            var filter = Builders<BsonDocument>.Filter.Eq("sample10", true);
+
+            var cursor = collection.Find(filter).ToCursor().ToEnumerable();
+
+            TitleCrewModel model;
+
+            foreach (var document in cursor)
             {
-                TitleCrewModel titleCrewModel;
-
                 try
                 {
-                    var columns = streamReader.ReadLine()?.Split("\t");
-
-                    if (columns == null)
-                    {
-                        continue;
-                    }
-
-                    titleCrewModel = new TitleCrewModel
-                    {
-                        TitleId = columns[0],
-                        Directors = columns[1].Split(",").ToList(),
-                        Writers = columns[2].Split(",").ToList()
-                    };
+                    model = new TitleCrewModel();
+                    model.TitleId = document["tconst"].AsString;
+                    model.Directors = ToList(document["directors"].AsBsonArray);
+                    model.Writers = ToList(document["writers"].AsBsonArray);
                 }
                 catch (Exception e)
                 {
@@ -252,37 +201,32 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
                     continue;
                 }
 
-                yield return titleCrewModel;
+                yield return model;
             }
         }
 
         public IEnumerable<TitleRatingModel> GetTitleRatings(IMDbCrawlJobData jobData)
         {
-            var tsvPath = DownloadAndUnzip("https://datasets.imdbws.com/title.ratings.tsv.gz", "title.ratings.tsv");
+            var client = new MongoClient(jobData.ConnectionString);
 
-            using StreamReader streamReader = new StreamReader(tsvPath);
+            var db = client.GetDatabase("imdb");
 
-            streamReader.ReadLine(); // skip the header
+            var collection = db.GetCollection<BsonDocument>("title.ratings");
 
-            while (!streamReader.EndOfStream)
+            var filter = Builders<BsonDocument>.Filter.Eq("sample10", true);
+
+            var cursor = collection.Find(filter).ToCursor().ToEnumerable();
+
+            TitleRatingModel model;
+
+            foreach (var document in cursor)
             {
-                TitleRatingModel titleRatingModel;
-
                 try
                 {
-                    var columns = streamReader.ReadLine()?.Split("\t");
-
-                    if (columns == null)
-                    {
-                        continue;
-                    }
-
-                    titleRatingModel = new TitleRatingModel
-                    {
-                        TitleId = columns[0],
-                        AverageRating = double.Parse(columns[1]),
-                        NumVotes = int.Parse(columns[2]),
-                    };
+                    model = new TitleRatingModel();
+                    model.TitleId = document["tconst"].AsString;
+                    model.AverageRating = document["averageRating"].AsDouble;
+                    model.NumVotes = document["numVotes"].AsDouble;
                 }
                 catch (Exception e)
                 {
@@ -290,7 +234,7 @@ namespace CluedIn.Crawling.IMDb.Infrastructure
                     continue;
                 }
 
-                yield return titleRatingModel;
+                yield return model;
             }
         }
     }

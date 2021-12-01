@@ -4,6 +4,6 @@ namespace CluedIn.Crawling.IMDb.Core
 {
     public class IMDbCrawlJobData : CrawlJobData
     {
-        public string Name { get; set; }
+        public string ConnectionString { get; set; } = "mongodb://localhost:27017";
     }
 }

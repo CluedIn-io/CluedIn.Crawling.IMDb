@@ -34,5 +34,16 @@ namespace CluedIn.Crawling.Provider.IMDb.Unit.Test.IMDbProvider
             Assert.IsType<IMDbCrawlJobData>(
                 await Sut.GetCrawlJobData(_context, dictionary, organizationId, userId, providerDefinitionId));
         }
+
+        [Theory]
+        [InlineAutoData("Connection String", "ConnectionString", "mongodb://localhost:27017")]
+        public async Task InitializesProperties(string key, string propertyName, string sampleValue,
+            Guid organizationId, Guid userId, Guid providerDefinitionId)
+        {
+            var dictionary = new Dictionary<string, object> { [key] = sampleValue };
+
+            var sut = await Sut.GetCrawlJobData(_context, dictionary, organizationId, userId, providerDefinitionId);
+            Assert.Equal(sampleValue, sut.GetType().GetProperty(propertyName).GetValue(sut));
+        }
     }
 }

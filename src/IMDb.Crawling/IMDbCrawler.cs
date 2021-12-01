@@ -31,30 +31,28 @@ namespace CluedIn.Crawling.IMDb
             }
 
             // 8.4M
-            foreach (var basicModel in client.GetTitleBasics(IMDbcrawlJobData))
+            foreach (var basicModel in client.GetTitleBasics(IMDbcrawlJobData).Take(10))
             {
                 yield return basicModel;
             }
 
             // 8.4M
-            foreach (var titleCrewModel in client.GetTitleCrew(IMDbcrawlJobData))
+            foreach (var titleCrewModel in client.GetTitleCrew(IMDbcrawlJobData).Take(10))
             {
                 yield return titleCrewModel;
             }
 
             // 29M
-            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData))
+            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData).Take(10))
             {
                 yield return titleAkaModel;
             }
 
             // 1.1M
-            foreach (var titleRatingModel in client.GetTitleRatings(IMDbcrawlJobData))
+            foreach (var titleRatingModel in client.GetTitleRatings(IMDbcrawlJobData).Take(10))
             {
                 yield return titleRatingModel;
             }
-
-            client.Cleanup();
         }
     }
 }

@@ -16,6 +16,6 @@
         /// <summary>
         /// numVotes - number of votes the title has received
         /// </summary>
-        public int NumVotes { get; set; }
+        public double NumVotes { get; set; }
     }
 }

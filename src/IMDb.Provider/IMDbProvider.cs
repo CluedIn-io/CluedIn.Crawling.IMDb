@@ -62,7 +62,14 @@ namespace CluedIn.Crawling.Provider.IMDb
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            return await Task.FromResult(new IMDbCrawlJobData());
+            var jobData = new IMDbCrawlJobData();
+
+            if (configuration.ContainsKey("Connection String"))
+            {
+                jobData.ConnectionString = configuration["Connection String"].ToString();
+            }
+
+            return await Task.FromResult(jobData);
         }
 
         public override Task<bool> TestAuthentication(
@@ -91,7 +98,14 @@ namespace CluedIn.Crawling.Provider.IMDb
                 throw new ArgumentNullException(nameof(jobData));
             }
 
-            return await Task.FromResult(new Dictionary<string, object>());
+            var dictionary = new Dictionary<string, object>();
+
+            if (jobData is IMDbCrawlJobData imdbCrawlJobData)
+            {
+                dictionary.Add("Connection String", imdbCrawlJobData.ConnectionString);
+            }
+
+            return await Task.FromResult(dictionary);
         }
 
         public override Task<IDictionary<string, object>> GetHelperConfiguration(

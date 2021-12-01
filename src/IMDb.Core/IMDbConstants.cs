@@ -25,9 +25,9 @@ namespace CluedIn.Crawling.IMDb.Core
             {
                 new Control
                 {
-                    displayName = "Name",
+                    displayName = "Connection String",
                     isRequired = false,
-                    name = "Name",
+                    name = "Connection String",
                     type = "text"
                 }
             }

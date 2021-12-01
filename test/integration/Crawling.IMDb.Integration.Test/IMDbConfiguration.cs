@@ -7,7 +7,10 @@ namespace CluedIn.Crawling.IMDb.Integration.Test
     {
         public static Dictionary<string, object> Create()
         {
-            return new Dictionary<string, object>();
+            return new Dictionary<string, object>
+            {
+                {"Connection String", "mongodb://localhost:27017"}
+            };
         }
     }
 }
