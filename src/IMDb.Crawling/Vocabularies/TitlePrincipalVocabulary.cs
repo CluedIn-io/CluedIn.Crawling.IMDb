@@ -7,12 +7,12 @@ namespace CluedIn.Crawling.IMDb.Vocabularies
     {
         public TitlePrincipalVocabulary()
         {
-            VocabularyName = "IMDb Title Principal";
+            VocabularyName = "IMDb Title PrincipalOf";
             KeyPrefix = "IMDb.title.principal";
             KeySeparator = ".";
             Grouping = IMDbConstants.EntityTypes.TitlePrincipal;
 
-            AddGroup("IMDb Title Principal", group =>
+            AddGroup("IMDb Title PrincipalOf", group =>
             {
                 TitleId = group.Add(new VocabularyKey(nameof(TitleId), VocabularyKeyDataType.Identifier))
                     .WithDescription("tconst (string) - alphanumeric unique identifier of the title");

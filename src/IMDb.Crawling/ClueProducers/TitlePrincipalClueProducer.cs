@@ -25,7 +25,7 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
 
-            var clue = _factory.Create(IMDbConstants.EntityTypes.TitlePrincipal, input.TitleId, accountId);
+            var clue = _factory.Create(IMDbConstants.EntityTypes.NameBasic, input.PersonId, accountId);
 
             var data = clue.Data.EntityData;
             var properties = data.Properties;
@@ -34,11 +34,14 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
 
             // tconst (string) - alphanumeric unique identifier of the title
             properties[titlePrincipalVocabulary.TitleId] = input.TitleId;
+
+            _factory.CreateOutgoingEntityReference(clue, IMDbConstants.EntityTypes.TitleBasic,
+                IMDbConstants.EntityEdgeTypes.PrincipalOf, input, input.TitleId.PrintIfAvailable());
+
             // ordering(integer) – a number to uniquely identify rows for a given titleId
             properties[titlePrincipalVocabulary.Ordering] = input.Ordering.PrintIfAvailable();
             // nconst(string) - alphanumeric unique identifier of the name / person
             properties[titlePrincipalVocabulary.PersonId] = input.PersonId;
-            // TODO: add references
             // category(string) - the category of job that person was in
             properties[titlePrincipalVocabulary.Category] = input.Category;
             // job(string) - the specific job title if applicable, else '\N'

@@ -54,7 +54,10 @@ namespace CluedIn.Crawling.IMDb
                 yield return titleRatingModel;
             }
 
-            client.Cleanup();
+            foreach (var titlePrincipalModel in client.GetTitlePrincipals(IMDbcrawlJobData))
+            {
+                yield return titlePrincipalModel;
+            }
         }
     }
 }
