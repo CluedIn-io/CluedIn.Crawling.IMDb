@@ -25,30 +25,22 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
         {
             if (input == null) throw new ArgumentNullException(nameof(input));
 
-            var clue = _factory.Create(IMDbConstants.EntityTypes.NameBasic, input.PersonId, accountId);
+            var clue = _factory.Create(EntityType.Infrastructure.User, input.PersonId, accountId);
 
             var data = clue.Data.EntityData;
             var properties = data.Properties;
 
-            var titlePrincipalVocabulary = IMDbVocabularyFactory.TitlePrincipalVocabulary;
-
-            // tconst (string) - alphanumeric unique identifier of the title
-            properties[titlePrincipalVocabulary.TitleId] = input.TitleId;
+            var nameBasicVocabulary = IMDbVocabularyFactory.NameBasicVocabulary;
 
             _factory.CreateOutgoingEntityReference(clue, IMDbConstants.EntityTypes.TitleBasic,
                 IMDbConstants.EntityEdgeTypes.PrincipalOf, input, input.TitleId.PrintIfAvailable());
 
-            // ordering(integer) – a number to uniquely identify rows for a given titleId
-            properties[titlePrincipalVocabulary.Ordering] = input.Ordering.PrintIfAvailable();
             // nconst(string) - alphanumeric unique identifier of the name / person
-            properties[titlePrincipalVocabulary.PersonId] = input.PersonId;
-            // category(string) - the category of job that person was in
-            properties[titlePrincipalVocabulary.Category] = input.Category;
-            // job(string) - the specific job title if applicable, else '\N'
-            properties[titlePrincipalVocabulary.Job] = input.Job;
-            // characters(string) - the name of the character played if applicable, else '\N'
-            properties[titlePrincipalVocabulary.Characters] = input.Characters;
-
+            properties[nameBasicVocabulary.PersonId] = input.PersonId;
+            _factory.CreateOutgoingEntityReference(clue, IMDbConstants.EntityTypes.TitleBasic,
+                $"{IMDbConstants.EntityEdgeTypes.PrincipalOf}/Category/{input.Category}", input, input.TitleId.PrintIfAvailable());
+            _factory.CreateOutgoingEntityReference(clue, IMDbConstants.EntityTypes.TitleBasic,
+                $"{IMDbConstants.EntityEdgeTypes.PrincipalOf}/Job/{input.Job}", input, input.TitleId.PrintIfAvailable());
             if (data.OutgoingEdges.Count == 0) _factory.CreateEntityRootReference(clue, EntityEdgeType.PartOf);
 
             return clue;

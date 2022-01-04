@@ -35,11 +35,9 @@ namespace CluedIn.Crawling.IMDb.Core
 
         public struct EntityTypes
         {
-            public const string NameBasic = "/IMDb/Name/Basic";
             public const string TitleAKA = "/IMDb/Title/AKA";
             public const string TitleBasic = "/IMDb/Title/Basic";
             public const string TitleEpisode = "/IMDb/Title/Episode";
-            public const string TitlePrincipal = "/IMDb/Title/PrincipalOf";
         }
 
         public struct EntityEdgeTypes

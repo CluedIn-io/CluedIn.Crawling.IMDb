@@ -24,7 +24,7 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
                 throw new ArgumentNullException(nameof(input));
             }
 
-            var clue = _factory.Create(IMDbConstants.EntityTypes.NameBasic, input.PersonId, accountId);
+            var clue = _factory.Create(EntityType.Infrastructure.User, input.PersonId, accountId);
 
             var data = clue.Data.EntityData;
             var properties = data.Properties;

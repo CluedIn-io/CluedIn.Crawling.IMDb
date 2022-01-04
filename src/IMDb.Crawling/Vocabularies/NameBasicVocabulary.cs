@@ -1,4 +1,5 @@
-﻿using CluedIn.Core.Data.Vocabularies;
+﻿using CluedIn.Core.Data;
+using CluedIn.Core.Data.Vocabularies;
 using CluedIn.Crawling.IMDb.Core;
 
 namespace CluedIn.Crawling.IMDb.Vocabularies
@@ -10,7 +11,7 @@ namespace CluedIn.Crawling.IMDb.Vocabularies
             VocabularyName = "IMDb Name";
             KeyPrefix = "IMDb.name.basic";
             KeySeparator = ".";
-            Grouping = IMDbConstants.EntityTypes.NameBasic;
+            Grouping = EntityType.Infrastructure.User;
 
             AddGroup("IMDb Name", group =>
             {

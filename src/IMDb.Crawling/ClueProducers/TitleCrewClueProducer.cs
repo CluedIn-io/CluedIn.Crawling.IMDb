@@ -38,14 +38,14 @@ namespace CluedIn.Crawling.IMDb.ClueProducers
             foreach (var director in input.Directors)
             {
                 // (Name)-[:Director]->(Title)
-                _factory.CreateIncomingEntityReference(clue, IMDbConstants.EntityTypes.NameBasic,
+                _factory.CreateIncomingEntityReference(clue, EntityType.Infrastructure.User,
                     IMDbConstants.EntityEdgeTypes.DirectorOf, input, director); // TODO: check, if this is enough or we need to build an entity code
             }
             // writers(array of nconsts) – writer(s) of the given title
             foreach (var writer in input.Writers)
             {
                 // (Name)-[:Writer]->(Title)
-                _factory.CreateIncomingEntityReference(clue, IMDbConstants.EntityTypes.NameBasic,
+                _factory.CreateIncomingEntityReference(clue, EntityType.Infrastructure.User,
                     IMDbConstants.EntityEdgeTypes.WriterOf, input, writer);
             }
 
