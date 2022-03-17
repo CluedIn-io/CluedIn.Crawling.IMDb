@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CluedIn.Core.Crawling;
 using CluedIn.Crawling.IMDb.Core;
+using CluedIn.Crawling.IMDb.Core.Models;
 using CluedIn.Crawling.IMDb.Infrastructure.Factories;
 
 namespace CluedIn.Crawling.IMDb
@@ -22,42 +23,30 @@ namespace CluedIn.Crawling.IMDb
                 yield break;
             }
 
-            var client = _clientFactory.CreateNew(IMDbcrawlJobData);
 
-            // 11.3M
-            foreach (var nameBasicModel in client.GetNames(IMDbcrawlJobData))
+            yield return new Employee
             {
-                yield return nameBasicModel;
-            }
+                FirstName = "Roman",
+                LastName = "Klymenko",
+                Company = "CluedIn"
+            };
 
-            // 8.4M
-            foreach (var basicModel in client.GetTitleBasics(IMDbcrawlJobData))
+            yield return new Employee
             {
-                yield return basicModel;
-            }
+                FirstName = "Roman",
+                LastName = "Klimenko",
+                Company = "Sitecore"
+            };
 
-            // 8.4M
-            foreach (var titleCrewModel in client.GetTitleCrew(IMDbcrawlJobData))
+            yield return new Company
             {
-                yield return titleCrewModel;
-            }
+                Name = "CluedIn"
+            };
 
-            // 29M
-            foreach (var titleAkaModel in client.GetTitleAKAs(IMDbcrawlJobData))
+            yield return new Company
             {
-                yield return titleAkaModel;
-            }
-
-            // 1.1M
-            foreach (var titleRatingModel in client.GetTitleRatings(IMDbcrawlJobData))
-            {
-                yield return titleRatingModel;
-            }
-
-            foreach (var titlePrincipalModel in client.GetTitlePrincipals(IMDbcrawlJobData))
-            {
-                yield return titlePrincipalModel;
-            }
+                Name = "Sitecore"
+            };
         }
     }
 }
